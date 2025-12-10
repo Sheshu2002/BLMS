@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout('Loan Application Form', ~{::section})}">
+<section>
+	<div class="container" style="max-width:720px">
+		<div class="card">
+			<div class="card-body">
+				<h2 class="card-title">Loan Application Form</h2>
+				<div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+				<form th:action="@{/applications/save}" th:object="${application}" method="post" class="stack">
+					<div class="form-row">
+						<label for="customerId">Customer</label>
+						<select id="customerId" name="customerId" th:value="${selectedCustomerId}">
+							<option th:each="customer : ${customers}" th:value="${customer.id}" th:text="${customer.name}" th:selected="${selectedCustomerId} == ${customer.id}"></option>
+						</select>
+					</div>
+					<div class="form-row">
+						<label for="productId">Loan Product</label>
+						<select id="productId" name="productId" th:value="${selectedProductId}">
+							<option th:each="product : ${products}"
+								th:value="${product.id}"
+								th:text="${product.name}"
+								th:data-min="${product.minAmount}"
+								th:data-max="${product.maxAmount}"
+								th:selected="${selectedProductId} == ${product.id}">
+							</option>
+						</select>
+						<p class="mb-0" id="amountHelp" style="color:#6b7280; font-size:14px"></p>
+					</div>
+					<div class="form-row">
+						<label for="amount">Amount</label>
+						<input type="number" id="amount" th:field="*{amount}" required>
+					</div>
+					<div class="form-actions">
+						<button class="btn btn-primary" type="submit">Submit Application</button>
+						<a class="btn" href="/applications">Cancel</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script>
+	(function() {
+		const productSelect = document.getElementById('productId');
+		const amountInput = document.getElementById('amount');
+		const help = document.getElementById('amountHelp');
+		function applyBounds() {
+			const option = productSelect.options[productSelect.selectedIndex];
+			const min = parseFloat(option.getAttribute('data-min'));
+			const max = parseFloat(option.getAttribute('data-max'));
+			if (!isNaN(min)) amountInput.min = String(min);
+			if (!isNaN(max)) amountInput.max = String(max);
+			help.textContent = (!isNaN(min) && !isNaN(max)) ? `Allowed range: ${min} - ${max}` : '';
+		}
+		productSelect.addEventListener('change', applyBounds);
+		// Run once on load
+		if (productSelect && amountInput) applyBounds();
+	})();
+	</script>
+</section>
+</html>

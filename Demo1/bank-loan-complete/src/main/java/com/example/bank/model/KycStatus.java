@@ -1,0 +1,1 @@
+package com.example.bank.model; public enum KycStatus { PENDING, VERIFIED }

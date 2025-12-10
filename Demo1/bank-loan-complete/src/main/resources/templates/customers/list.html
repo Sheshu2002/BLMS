@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout('Customers', ~{::section})}">
+<section>
+	<div class="split mb-3">
+		<h2 class="mb-0">Customers</h2>
+		<a href="/customers/add" class="btn btn-primary">Add New Customer</a>
+	</div>
+	<div class="alert alert-info" th:if="${customers.isEmpty()}">No customers found.</div>
+	<div class="table-wrapper" th:unless="${customers.isEmpty()}">
+		<table>
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Email</th>
+					<th>Phone</th>
+					<th>Address</th>
+					<th>KYC Status</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="customer : ${customers}">
+					<td th:text="${customer.id}"></td>
+					<td th:text="${customer.name}"></td>
+					<td th:text="${customer.email}"></td>
+					<td th:text="${customer.phone}"></td>
+					<td th:text="${customer.address}"></td>
+					<td th:text="${customer.kycStatus}"></td>
+					<td class="cluster">
+						<a class="btn" th:href="@{/customers/edit/{id}(id=${customer.id})}">Edit</a>
+						<a class="btn" th:href="@{/customers/delete/{id}(id=${customer.id})}">Delete</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</section>
+</html>

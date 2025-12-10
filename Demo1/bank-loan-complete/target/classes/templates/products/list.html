@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout('Loan Products', ~{::section})}">
+<section>
+	<div class="split mb-3">
+		<h2 class="mb-0">Loan Products</h2>
+		<a href="/products/add" class="btn btn-primary">Add New Product</a>
+	</div>
+	<div class="alert alert-info" th:if="${products.isEmpty()}">No loan products found. Please add a new one.</div>
+	<div class="table-wrapper" th:unless="${products.isEmpty()}">
+		<table>
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Interest Rate</th>
+					<th>Min Amount</th>
+					<th>Max Amount</th>
+					<th>Tenure (Months)</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="product : ${products}">
+					<td th:text="${product.id}"></td>
+					<td th:text="${product.name}"></td>
+					<td th:text="${product.interestRate}"></td>
+					<td th:text="${product.minAmount}"></td>
+					<td th:text="${product.maxAmount}"></td>
+					<td th:text="${product.tenureMonths}"></td>
+					<td class="cluster">
+						<a class="btn" th:href="@{/products/edit/{id}(id=${product.id})}">Edit</a>
+						<a class="btn" th:href="@{/products/delete/{id}(id=${product.id})}">Delete</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</section>
+</html>

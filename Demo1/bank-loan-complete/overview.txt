@@ -1,0 +1,112 @@
+Bank Loan Management System - Overview
+
+1) Purpose
+- A simple end-to-end web app to manage customers, loan products, loan applications, repayment schedules, and basic reports.
+- Includes session-based authentication and KYC gating for loan applications.
+
+2) Tech Stack
+- Backend: Spring Boot 3.2, Java 17
+- Web MVC: Spring MVC + Thymeleaf templates
+- Persistence: Spring Data JPA (Hibernate)
+- Database: MySQL (jdbc:mysql://localhost:3306/bankloansystem)
+- Build: Maven
+- Utilities: Lombok for boilerplate, jBCrypt for password hashing
+
+3) Modules and Key Packages
+- com.example.bank.config
+  - WebConfig: Registers SessionAuthInterceptor, securing all paths except login/register/static.
+  - SessionAuthInterceptor: Redirects unauthenticated users to /login.
+  - GlobalExceptionHandler: Converts uncaught exceptions to user-friendly flash messages.
+- com.example.bank.controller
+  - UiController: Home page and favicon forward.
+  - AuthController: Login, register, logout; stores AppUser in HTTP session on success.
+  - CustomerController: CRUD for customers; delete guarded when active applications exist.
+  - LoanProductController: CRUD for loan products; validates maxAmount > minAmount.
+  - LoanApplicationController: Create/list/edit/delete applications; filters customers to KYC VERIFIED; validates amount within product bounds; sets status and applied date.
+  - RepaymentController: Generates schedules for APPROVED applications, view/pay/undo payments.
+  - ReportController: Simple metrics (counts and outstanding total) across applications.
+- com.example.bank.model
+  - Entities: AppUser, Customer (with KycStatus), LoanProduct, LoanApplication (with ApprovalStatus), Repayment.
+  - Enums: KycStatus {PENDING, VERIFIED}, ApprovalStatus {PENDING, APPROVED, REJECTED}.
+- com.example.bank.repository
+  - Spring Data repositories for each entity.
+  - CustomerRepository: findByEmail, findByKycStatus for filtering verified customers.
+- com.example.bank.service
+  - AuthService: Registers users with BCrypt-hashed passwords; authenticates on login.
+  - CustomerService: CRUD and guarded delete; listVerified helper.
+  - LoanProductService: CRUD for products.
+  - LoanApplicationService: CRUD, listWithRepayments, listByStatus; cascaded repayment deletion on app delete.
+  - RepaymentService: EMI schedule generation, mark pay/undo, outstanding calculation.
+- resources/templates
+  - Thymeleaf pages for customers, products, applications, repayments, reports, and fragments/layout.
+  - Forms use model attributes and basic client-side hints.
+
+4) High-Level Code Flow
+- Auth
+  1. User visits any protected path; interceptor checks session.
+  2. If not authenticated, redirect to /login.
+  3. On login, AuthService verifies credentials using BCrypt and stores AppUser in session.
+- Customers
+  1. /customers list shows all customers.
+  2. Add/edit via form; KYC status can be set (default PENDING).
+  3. Delete is blocked if the customer has non-rejected applications.
+- Loan Products
+  1. /products list shows all products.
+  2. Add/edit validates on server that maxAmount > minAmount; form shows error if invalid.
+- Loan Applications
+  1. /applications/add loads: application model, verified customers only, and all products.
+  2. On submit: server checks selected customer's KYC is VERIFIED; validates amount within selected product's min/max; sets appliedDate and PENDING status; saves.
+  3. Users can edit or delete applications. Approval/rejection toggles status.
+- Repayments
+  1. For APPROVED applications, generate schedule creates EMI-style installments over product tenure.
+  2. View schedule lists installments; pay/undo toggles completion and payment date.
+  3. Outstanding is computed based on remaining EMIs, rounded and interest-aware.
+- Reports
+  1. /reports summarizes application counts and outstanding totals.
+
+5) Data and Initialization
+- application.properties points to MySQL with ddl-auto=update and show-sql=true.
+- DataInitializer seeds sample customers (one VERIFIED, one PENDING) and two products if tables are empty.
+
+6) Security Notes
+- Session-based auth only, no roles; all authenticated users can access features.
+- Passwords are stored as BCrypt hashes; registration enforces unique username/email.
+
+7) Build & Run
+- Prereqs: Java 17, Maven, MySQL running with user root/root (adjust in application.properties if needed).
+- Build: mvn clean package
+- Run: mvn spring-boot:run or run the generated jar.
+- App URLs: /, /customers, /products, /applications, /repayments, /reports, /login, /register
+
+8) UI/UX
+- Thymeleaf templates with a simple layout. Navigation in fragments/layout.html.
+- Forms have basic client-side hints (e.g., amount bounds, max > min) and server-side error messages.
+
+9) Extensibility Ideas
+- Add roles/authorities, audit logs.
+- Add pagination/search on lists.
+- Add REST APIs and front-end SPA.
+- Add validations at entity level (Jakarta Validation) and form binding errors.
+- Strengthen exception handling and flash messaging across pages.
+
+10) Annotations Used
+- @SpringBootApplication: Bootstraps Spring Boot with auto-configuration and component scanning.
+- @Controller: Marks MVC controllers returning views (Thymeleaf templates).
+- @GetMapping / @PostMapping / @RequestMapping: Maps HTTP routes to handler methods/classes.
+- @PathVariable / @RequestParam / @ModelAttribute: Binds URL segments, query/form params, and form objects.
+- @ControllerAdvice / @ExceptionHandler: Global exception handling mapped to user feedback.
+- @Configuration: Declares a Spring configuration class.
+- @Component: Registers a general Spring bean (e.g., interceptors).
+- @RequiredArgsConstructor (Lombok): Generates constructor for final fields; supports constructor injection.
+- @Autowired: Field injection for Spring beans (used in RepaymentController).
+- @Service: Marks service-layer beans.
+- @Entity: Marks JPA entity classes persisted to tables.
+- @Id / @GeneratedValue(strategy = GenerationType.IDENTITY): Primary key with auto-increment.
+- @Column: Column constraints (unique, nullable) on entity fields.
+- @Enumerated(EnumType.STRING): Stores enum values as strings in the database.
+- @ManyToOne(optional = false): Many-to-one relationship with a required foreign key.
+- @OneToMany(mappedBy = ..., cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY): One-to-many relationship with cascading and lazy loading.
+- @Query: Custom JPQL queries in repositories.
+- @Transactional (Spring): Transaction demarcation for write operations and consistency.
+- @Transactional (Jakarta): Transaction demarcation (also used to enable lazy loading where needed).
+- @Getter / @Setter / @NoArgsConstructor / @AllArgsConstructor / @Builder / @Data (Lombok): Generates boilerplate code for models and DTOs. 

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout (pageTitle, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle}">Bank System</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/alerque/libertinus/webfonts/libertinus.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="/">BLMS</a>
+        <nav class="main-nav">
+            <a href="/customers">Customers</a>
+            <a href="/products">Products</a>
+            <a href="/applications">Applications</a>
+            <a href="/repayments">Repayments</a>
+            <a href="/reports">Reports</a>
+        </nav>
+        <div class="auth-area">
+            <div th:if="${session.user == null}">
+<!--                <a class="btn btn-link" href="/login">Login</a>-->
+                <a class="btn btn-primary" href="/register">Register</a>
+            </div>
+            <div class="user-info" th:if="${session.user != null}">
+                <span class="username" th:text="${session.user.username}"></span>
+                <form method="post" action="/logout">
+                    <button class="btn btn-outline" type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+</header>
+<main class="container page-content">
+    <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+    <div th:insert="${content}"></div>
+</main>
+</body>
+</html> 

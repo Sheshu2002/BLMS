@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout('Reports', ~{::section})}">
+<section>
+	<h2>Bank Reports</h2>
+	<div class="split" style="gap:12px; flex-wrap:wrap">
+		<div class="card" style="flex:1; min-width:220px">
+			<div class="card-body">
+				<h3 class="card-title">Total Applications</h3>
+				<p class="display" th:text="${totalApplications}"></p>
+			</div>
+		</div>
+		<div class="card" style="flex:1; min-width:220px">
+			<div class="card-body">
+				<h3 class="card-title">Approved</h3>
+				<p class="display" th:text="${approved}"></p>
+			</div>
+		</div>
+		<div class="card" style="flex:1; min-width:220px">
+			<div class="card-body">
+				<h3 class="card-title">Pending</h3>
+				<p class="display" th:text="${pending}"></p>
+			</div>
+		</div>
+		<div class="card" style="flex:1; min-width:220px">
+			<div class="card-body">
+				<h3 class="card-title">Outstanding Total</h3>
+				<p class="display" th:text="${#numbers.formatDecimal(outstandingTotal, 0, 'COMMA', 2, 'POINT')}"></p>
+			</div>
+		</div>
+	</div>
+</section>
+</html>

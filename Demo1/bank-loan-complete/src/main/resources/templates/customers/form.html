@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout('Customer Form', ~{::section})}">
+<section>
+	<div class="container" style="max-width:720px">
+		<div class="card">
+			<div class="card-body">
+				<h2 class="card-title" th:text="${customer.id == null ? 'Add New Customer' : 'Edit Customer'}"></h2>
+				<form th:action="@{/customers/save}" th:object="${customer}" method="post" class="stack">
+					<input type="hidden" th:field="*{id}" />
+					<div class="form-row">
+						<label for="name">Name</label>
+						<input type="text" id="name" th:field="*{name}" required>
+					</div>
+					<div class="form-row">
+						<label for="email">Email</label>
+						<input type="email" id="email" th:field="*{email}" required>
+					</div>
+					<div class="form-row">
+						<label for="phone">Phone</label>
+						<input type="tel" id="phone" minlength="10" maxlength="10" pattern="[6-9]{1}[0-9]{9}" th:field="*{phone}" required>
+					</div>
+					<div class="form-row">
+						<label for="address">Address</label>
+						<input type="text" id="address" th:field="*{address}" required>
+					</div>
+					<div class="form-row">
+						<label for="kycStatus">KYC Status</label>
+						<select id="kycStatus" th:field="*{kycStatus}">
+							<option th:each="status : ${T(com.example.bank.model.KycStatus).values()}" th:value="${status}" th:text="${status}"></option>
+						</select>
+					</div>
+					<div class="form-actions">
+						<button class="btn btn-primary" type="submit">Save</button>
+						<a class="btn" href="/customers">Cancel</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</section>
+</html>

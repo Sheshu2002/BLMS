@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout('Loan Applications', ~{::section})}">
+<section>
+	<div class="split mb-3">
+		<h2 class="mb-0">Loan Applications</h2>
+		<a href="/applications/add" class="btn btn-primary">Add New Application</a>
+	</div>
+	<div class="alert alert-info" th:if="${applications.isEmpty()}">No loan applications found. Please add a new one.</div>
+	<div class="table-wrapper" th:unless="${applications.isEmpty()}">
+		<table>
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Customer Name</th>
+					<th>Product Name</th>
+					<th>Amount</th>
+					<th>Applied Date</th>
+					<th>Status</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="app : ${applications}">
+					<td th:text="${app.id}"></td>
+					<td th:text="${app.customer.name}"></td>
+					<td th:text="${app.loanProduct.name}"></td>
+					<td th:text="${app.amount}"></td>
+					<td th:text="${app.appliedDate}"></td>
+					<td>
+						<span class="badge" th:classappend="${app.status.name() == 'APPROVED'} ? ' bg-success' : (${app.status.name() == 'REJECTED'} ? ' bg-danger' : ' bg-secondary')" th:text="${app.status}"></span>
+					</td>
+					<td class="cluster">
+						<a class="btn" th:if="${app.status.name() == 'PENDING'}" th:href="@{/applications/approve/{id}(id=${app.id})}">Approve</a>
+						<a class="btn" th:if="${app.status.name() == 'PENDING'}" th:href="@{/applications/reject/{id}(id=${app.id})}">Reject</a>
+						<a class="btn" th:href="@{/applications/delete/{id}(id=${app.id})}">Delete</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</section>
+</html>
